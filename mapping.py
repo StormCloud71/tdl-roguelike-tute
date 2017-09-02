@@ -1,9 +1,15 @@
+from random import randint
+
 class Rect:
     def __init__(self,x,y,w,h):
         self.x1=x
         self.y1=y
         self.x2=x+w
         self.y2=y+h
+    def center(self):
+        return (int((self.x1+self.x2)/2),int((self.y1+self.y2)/2))
+    def intersect(self,other):
+        return (other.x2>=self.x1 and other.x1<=self.x2 and other.y2>=self.y1 and other.y1<self.y2)
 
 def make_room(game_map,room):
     for i in range(room.x1+1,room.x2):
@@ -22,7 +28,7 @@ def make_v_tunnel(game_map,y1,y2,x):
         game_map.transparent[x,i]=True
 		
 
-def make_map(game_map):
+def make_map_demo(game_map):
     # Create two rooms for demonstration purposes
     room1 = Rect(20, 15, 10, 15)
     room2 = Rect(35, 15, 10, 15)
@@ -35,3 +41,44 @@ def make_map(game_map):
     make_h_tunnel(game_map,30,35,20)
     make_v_tunnel(game_map, 10,15,40)
     
+def make_map(game_map,max_rooms, room_min_size, room_max_size, map_width,map_height, player):
+    rooms = []
+    num_rooms = 0
+
+    for r in range(max_rooms):
+        # random width and height
+        w = randint(room_min_size, room_max_size)
+        h = randint(room_min_size, room_max_size)
+        # random position without going out of the boundaries of the map
+        x = randint(0, map_width - w - 1)
+        y = randint(0, map_height - h - 1)
+        new_room=Rect(x,y,w,h)
+        new_room_ok_flag=True
+        #did away with idiosyncratic python use, went with a simple logical flag
+        #I might try to write it in a more pythonic way with map/reduce
+        if rooms!=[]:
+            for room in rooms:
+                new_room_ok_flag=new_room_ok_flag and not new_room.intersect(room)
+        if new_room_ok_flag:
+		    #make the goddamn room
+            make_room(game_map, new_room)
+		    #find the center of the new room
+            (new_x, new_y) = new_room.center()
+            if num_rooms==0:
+                #player will start in the first room created
+                player.x=new_x
+                player.y=new_y
+            else:
+                (prev_x, prev_y) = rooms[num_rooms - 1].center()
+                # flip a coin (random number that is either 0 or 1)
+                if randint(0, 1) == 1:
+                    # first move horizontally, then vertically
+                    make_h_tunnel(game_map, prev_x, new_x, prev_y)
+                    make_v_tunnel(game_map, prev_y, new_y, new_x)
+                else:
+                    # first move vertically, then horizontally
+                    make_v_tunnel(game_map, prev_y, new_y, prev_x)
+                    make_h_tunnel(game_map, prev_x, new_x, new_y)
+            rooms.append(new_room)
+            num_rooms+=1
+            
