@@ -1,6 +1,8 @@
 from tdl.map import Map
 from random import randint
 from entity import Entity
+from components.fighter import Fighter
+from components.ai import BasicMonster
 
 class GameMap(Map):
     def __init__(self, width, height):
@@ -45,9 +47,13 @@ def place_entities(room, entities, max_monsters_per_room, colors):
 
         if not any([entity for entity in entities if entity.x == x and entity.y == y]):
             if randint(0, 100) < 80:
-                monster = Entity(x, y, 's', colors.get('dark_brown'),'Soldier',blocks=True)
+                fighter_component=Fighter(hp=10,defense=0,power=3)
+                ai_component=BasicMonster()
+                monster = Entity(x, y, 's', colors.get('dark_brown'),'Soldier',blocks=True, fighter=fighter_component,ai=ai_component)
             else:
-                monster = Entity(x, y, 'K', colors.get('slate_gray'),'Knight',blocks=True)
+                fighter_component=Fighter(hp=15,defense=1,power=6)
+                ai_component=BasicMonster()
+                monster = Entity(x, y, 'K', colors.get('slate_gray'),'Knight',blocks=True, fighter=fighter_component,ai=ai_component)
 
             entities.append(monster)
 		

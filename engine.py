@@ -4,6 +4,7 @@ from entity import Entity, get_blocking_entities_at_location
 from game_states import GameStates
 from render_functions import clear_all, render_all
 from mapping import make_map, GameMap
+from components.fighter import Fighter
 
 def main():
     screen_width = 80
@@ -34,10 +35,9 @@ def main():
     tdl.set_font('arial10x10.png', greyscale=True, altLayout=True)
     
     
-#    player = Entity(int(screen_width / 2), int(screen_height / 2), '@', (255, 255, 255))
-#    npc = Entity(int(screen_width / 2), int(screen_height / 2), '@', (0, 255, 0))
-#    entities = [npc, player]
-    player = Entity(0, 0, '@', (255, 255, 255),'Player',blocks=True)
+
+    fighter_component = Fighter(hp=30, defense=2, power=5)
+    player = Entity(0, 0, '@', (255, 255, 255),'Player',blocks=True,fighter=fighter_component)
     entities = [player]    
     
     root_console = tdl.init(screen_width, screen_height, title='Roguelike Tutorial With extra Elbow Grease.')
@@ -93,8 +93,8 @@ def main():
 
         if game_state == GameStates.ENEMY_TURN:
             for entity in entities:
-                if entity != player:
-                    print('The ' + entity.name + ' ponders the meaning of its existence.')
+                if entity.ai:
+                    entity.ai.take_turn()
 
             game_state = GameStates.PLAYERS_TURN
 
