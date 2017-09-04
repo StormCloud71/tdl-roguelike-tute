@@ -29,7 +29,8 @@ def main():
         'light_wall': (130, 110, 50),
         'light_ground': (200, 180, 50),
         'dark_brown' :  (51, 25,0),
-        'slate_gray' :  (112,128,144)
+        'slate_gray' :  (112,128,144),
+        'crimson': (220,20,60)
     }
 #end definition
     tdl.set_font('arial10x10.png', greyscale=True, altLayout=True)

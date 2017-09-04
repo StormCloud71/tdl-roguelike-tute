@@ -3,6 +3,7 @@ from random import randint
 from entity import Entity
 from components.fighter import Fighter
 from components.ai import BasicMonster
+from bestiary import ReturnBeast
 
 class GameMap(Map):
     def __init__(self, width, height):
@@ -35,7 +36,7 @@ def make_v_tunnel(game_map,y1,y2,x):
     for i in range(min(y1,y2),max(y1,y2)+1):
         game_map.walkable[x,i]=True
         game_map.transparent[x,i]=True
-
+         
 def place_entities(room, entities, max_monsters_per_room, colors):
     # Get a random number of monsters
     number_of_monsters = randint(0, max_monsters_per_room)
@@ -45,16 +46,15 @@ def place_entities(room, entities, max_monsters_per_room, colors):
         x = randint(room.x1 + 1, room.x2 - 1)
         y = randint(room.y1 + 1, room.y2 - 1)
 
-        if not any([entity for entity in entities if entity.x == x and entity.y == y]):
-            if randint(0, 100) < 80:
-                fighter_component=Fighter(hp=10,defense=0,power=3)
-                ai_component=BasicMonster()
-                monster = Entity(x, y, 's', colors.get('dark_brown'),'Soldier',blocks=True, fighter=fighter_component,ai=ai_component)
-            else:
-                fighter_component=Fighter(hp=15,defense=1,power=6)
-                ai_component=BasicMonster()
-                monster = Entity(x, y, 'K', colors.get('slate_gray'),'Knight',blocks=True, fighter=fighter_component,ai=ai_component)
+#and now, we start to diverge from the tutorial.
+#added a bestiary module to manage monster generation
 
+        if not any([entity for entity in entities if entity.x == x and entity.y == y]):
+            img, col, nm, fight_stats= ReturnBeast()
+            h,d,p=fight_stats
+            fighter_component=Fighter(hp=h,defense=d,power=p)
+            ai_component=BasicMonster()
+            monster = Entity(x,y,img,colors.get(col),nm, blocks=True,fighter=fighter_component,ai=ai_component)
             entities.append(monster)
 		
 
